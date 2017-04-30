@@ -9,8 +9,16 @@ var mouse = {
     y: undefined
 }
 
+var max_radius = 80;
+
 window.addEventListener('mousemove', mouseMove);
 window.addEventListener('touchmove', mouseMove);
+
+window.addEventListener('resize', 
+    function() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;       
+    });
 
 function mouseMove(event) {
     mouse.x = event.x;
@@ -18,15 +26,21 @@ function mouseMove(event) {
     //console.log(mouse.x + "," + mouse.y);   
 }
 
-
+var colors = [
+    '#468966',
+    '#FFF0A5',
+    '#FFB03B',
+    '#B64926',
+    '#8E2800'
+];
 var circles = [];
-for (var i = 0; i < 25; i++) {
+for (var i = 0; i < 300; i++) {
     var x = Math.random() * innerWidth - (r * 2);
     var y = Math.random() * innerHeight - (r * 2);
 
     var dx = (Math.random() - 0.5) * 8;
     var dy = (Math.random() - 0.5) * 8;
-    var r = Math.random() * 40;
+    var r = (Math.random() * 10) + 1;
     circles.push(new Circle(x, y, dx, dy, r))
 }
 
@@ -49,6 +63,7 @@ function Circle(x, y, dx, dy, r) {
     this.dx = dx;
     this.dy = dy;
     this.r = r;
+    this.c = colors[Math.floor(Math.random() * colors.length)];
     this.current_radius = r;
 
     this.draw = function() {
@@ -56,7 +71,7 @@ function Circle(x, y, dx, dy, r) {
         c.arc(this.x, this.y, this.current_radius, Math.PI * 2, false);
         c.shadowBlur = 10;
         c.shadowColor = 'black';
-        c.fillStyle = 'blue';
+        c.fillStyle = this.c;
         c.fill();       
     }
 
@@ -70,11 +85,13 @@ function Circle(x, y, dx, dy, r) {
         this.x += this.dx;
         this.y += this.dy;  
 
-        if (Math.abs(mouse.x - this.x) < 50 && Math.abs(mouse.y - this.y) < 50) {
-            this.current_radius += 5;
+        if (Math.abs(mouse.x - this.x) < 100 && Math.abs(mouse.y - this.y) < 100) {
+            if (this.current_radius < max_radius) {
+                this.current_radius += 5;
+            }            
         } else {
             if (this.current_radius > this.r) {
-                this.current_radius -= 5;
+                this.current_radius -= 1;
             }
         }
 
