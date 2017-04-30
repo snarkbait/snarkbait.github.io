@@ -4,6 +4,20 @@ canvas.height = window.innerHeight;
 
 var c = canvas.getContext('2d');
 
+var mouse = {
+    x: undefined,
+    y: undefined
+}
+
+window.addEventListener('mousemove', mouseMove);
+window.addEventListener('touchmove', mouseMove);
+
+function mouseMove(event) {
+    mouse.x = event.x;
+    mouse.y = event.y;
+    //console.log(mouse.x + "," + mouse.y);   
+}
+
 
 var circles = [];
 for (var i = 0; i < 25; i++) {
@@ -35,10 +49,11 @@ function Circle(x, y, dx, dy, r) {
     this.dx = dx;
     this.dy = dy;
     this.r = r;
+    this.current_radius = r;
 
     this.draw = function() {
         c.beginPath();
-        c.arc(this.x, this.y, this.r, Math.PI * 2, false);
+        c.arc(this.x, this.y, this.current_radius, Math.PI * 2, false);
         c.shadowBlur = 10;
         c.shadowColor = 'black';
         c.fillStyle = 'blue';
@@ -46,14 +61,22 @@ function Circle(x, y, dx, dy, r) {
     }
 
     this.update = function() {
-        if (this.x  + this.r > innerWidth || this.x - this.r < 0) {
+        if (this.x  + this.current_radius > innerWidth || this.x - this.current_radius < 0) {
             this.dx = -this.dx;
         }
-        if (this.y + this.r > innerHeight || this.y - this.r < 0) {
+        if (this.y + this.current_radius > innerHeight || this.y - this.current_radius < 0) {
             this.dy = -this.dy;
         }
         this.x += this.dx;
         this.y += this.dy;  
+
+        if (Math.abs(mouse.x - this.x) < 50 && Math.abs(mouse.y - this.y) < 50) {
+            this.current_radius += 5;
+        } else {
+            if (this.current_radius > this.r) {
+                this.current_radius -= 5;
+            }
+        }
 
         this.draw();     
     }
